@@ -86,8 +86,8 @@ class Hairtail{
         return this.object.style.backgroundImage;
     }
     Update(){
-        this.object.style.height = `${width * 0.07}px`
-        this.object.style.width = `${width * 0.07}px`
+        this.object.style.height = `${(width + height) / 2 * 0.07}px`
+        this.object.style.width = `${(width + height) / 2 * 0.07}px`
         this.object.style.top = `${this.transform.position.y.replace("px","") - Number(this.object.style.height.replace("px", ""))}px`
         this.object.style.left = `${this.transform.position.x.replace("px","") - Number(this.object.style.width.replace("px", ""))}px`
         
@@ -130,7 +130,7 @@ buttonSet.loadGameButtonUI.object.onclick = () => {
         });
         posX += 0.07;
         if (posX + 0.07 > 1){
-            posY += 0.07
+            posY += 0.12
             posX = 0.2
         }
         }
@@ -146,7 +146,7 @@ settingEndButtonUI.onclick = () => {
     settingBoxUI.style.display = "none";
 }
 buyHairtailButtonUI.onclick = () => {
-    if (hairtailSet.length < 66 && money > eggPrice){
+    if (hairtailSet.length < 55 && money > eggPrice){
         money -= eggPrice;
         eggPrice += Math.floor(Math.random() * 20) - 10
         let hairtailObject = new Hairtail(width * posX, height * posY, 0);
@@ -157,7 +157,7 @@ buyHairtailButtonUI.onclick = () => {
         });
         posX += 0.07;
         if (posX + 0.07 > 1){
-            posY += 0.07
+            posY += 0.12
             posX = 0.2
         }
     }
