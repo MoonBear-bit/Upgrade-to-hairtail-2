@@ -8,9 +8,32 @@
 </head>
 <body>
     <div id="World" class="World"></div>
-    <button id="LoadGame" class="button">Load Game</button>
-    <button id="NewGame" class="button">New Game</button>
-    <button id="Setting" class="button">Setting</button>
+    <div id="LobbyButtonSet" class="Lobby">
+        <button id="LoadGame" class="button">Load Game</button>
+        <button id="NewGame" class="button">New Game</button>
+        <button id="Setting" class="button">Setting</button>
+    </div>
+    <div id="TalkBox" class="talkBox">
+        <span id="Span"></span>
+        <img src="./Image/Worm.png" class="worm" id="Worm">
+    </div>
+    <div id="InGameUISet" class="Lobby"></div>
+    <div id="SettingBox" class="SettingBox">
+        <select name="language" id="language" size="1" class="select">
+            <option value="English">English</option>
+            <option value="한국어">한국어</option>
+        </select>
+        <button id="SettingEnd" class="setend">End</button>
+    </div>
+    <span class="TEXT InGame" id="Money">$</span>
+    <span class="TEXT InGame" id="TreatmentKit">TreatmentKit</span>
+    <button class="button InGame" id="BuyHairtail">Buy Hairtail</button>
+    <div id="UpgradeHairtail" class="SettingBox InGame">
+        <div class="hairtail" id="HairtailCanvas">
+            <img src="./Image/lv0.png" id="hairtailImage" class="hairtailImage">
+        </div>
+        <button id="UpgradeEnd" class="setend">End</button>
+    </div>
     <script src="Code/script.js"></script>
 </body>
 </html>
