@@ -70,7 +70,7 @@ class Hairtail{
         this.object.id = "hairtail" + hairtailNumber
         hairtailNumber++
         this.object.style.opacity = 1
-        this.object.src = `./Image/lv${this.data.hairtailLevel}.png`;
+        this.object.src = `./Image/lv${this.data.hairtailLevel}.webp`;
         hairtailSet.push(this);
         document.body.appendChild(this.object);
         return this
@@ -94,11 +94,11 @@ class Hairtail{
     }
     Upgrade(){
         this.data.hairtailLevel += 1;
-        this.object.src = `./Image/lv${this.data.hairtailLevel}.png`;
+        this.object.src = `./Image/lv${this.data.hairtailLevel}.webp`;
     }
     Reset(){
         this.data.hairtailLevel = 0;
-        this.object.src = `./Image/lv${this.data.hairtailLevel}.png`;
+        this.object.src = `./Image/lv${this.data.hairtailLevel}.webp`;
     }
 }
 settingBoxUI.style.display = "none"
@@ -117,8 +117,8 @@ buttonSet.newGameButtonUI.object.onclick = () => {
     startTutorial();
 }
 buttonSet.loadGameButtonUI.object.onclick = () => {
-    let posX = 0.2;
-    let posY = 0.3;
+    posX = 0.2;
+    posY = 0.3;
     if (localStorage.getItem("isLoad")){
         let NewSet = JSON.parse(localStorage.getItem("hairtailSet"));
         for (object of NewSet){
