@@ -178,12 +178,15 @@ function InGameLoop(){
     localStorage.setItem("treatmentKit", treatmentKit);
     requestAnimationFrame(InGameLoop);
 }
-function Loop(){
+UpdateUI();
+window.addEventListener("resize", () => {
     width = window.innerWidth;
     height = window.innerHeight;
     _buttonTemplate1.width = width / 10;
     _buttonTemplate1.height = height / 12;
     UpdateUI();
+});
+function Loop(){
     requestAnimationFrame(Loop);
 }
 function startTutorial(){
@@ -331,4 +334,5 @@ function StartGame(){
 }
 
 Loop();
+
 
