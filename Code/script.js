@@ -108,6 +108,8 @@ background.style.backgroundSize = `${width}px ${height}px`;
 background.style.opacity = 0.1;
 buttonSet.loadGameButtonUI.object.style.display = (localStorage.getItem("isLoad")) ? "block" : "none"
 talkBoxUI.style.display = "none";
+document.body.style.margin = "0px";
+document.body.style.overflow = "hidden";
 buttonSet.newGameButtonUI.object.onclick = () => {
     localStorage.setItem("isLoad", true);
     localStorage.setItem("hairtailSet", JSON.stringify([]));
@@ -326,4 +328,5 @@ function StartGame(){
     buyHairtailButtonUI.style.display = "block"
     InGameLoop();
 }
+
 Loop();
