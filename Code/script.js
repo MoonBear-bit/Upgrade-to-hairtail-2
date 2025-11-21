@@ -110,6 +110,7 @@ buttonSet.loadGameButtonUI.object.style.display = (localStorage.getItem("isLoad"
 talkBoxUI.style.display = "none";
 document.body.style.margin = "0px";
 document.body.style.overflow = "hidden";
+document.body.style.padding = "0px";
 buttonSet.newGameButtonUI.object.onclick = () => {
     localStorage.setItem("isLoad", true);
     localStorage.setItem("hairtailSet", JSON.stringify([]));
@@ -330,3 +331,4 @@ function StartGame(){
 }
 
 Loop();
+
