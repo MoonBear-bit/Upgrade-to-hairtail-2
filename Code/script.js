@@ -1,5 +1,6 @@
 let background = document.getElementById("World");
 let talkBoxUI = document.getElementById("TalkBox");
+let talkBoxServiceUI = document.getElementById("TalkBoxService");
 let wormUI = document.getElementById("Worm");
 let spanUI = document.getElementById("Span");
 let LobbyButtonSetUI = document.getElementById("LobbyButtonSet");
@@ -13,6 +14,9 @@ let upgradeHairtailUI = document.getElementById("UpgradeHairtail");
 let hairtailCanvasUI = document.getElementById("HairtailCanvas");
 let hairtailImageUI = document.getElementById("hairtailImage");
 let upgradeEndButtonUI = document.getElementById("UpgradeEnd");
+let upgradeButtonUI = document.getElementById("UpgradeButton");
+let sellButtonUI = document.getElementById("SellButton")
+let isClassButtonElement = [...document.querySelectorAll(".button")];
 let buttonSet = {
     loadGameButtonUI: {object:document.getElementById("LoadGame"), type:"Button 1", Xpos:0.5, Ypos:0.5},
     newGameButtonUI: {object:document.getElementById("NewGame"), type:"Button 1", Xpos:0.5, Ypos:0.4},
@@ -36,11 +40,11 @@ let posX = 0.2;
 let posY = 0.3;
 let eggPrice = 1000;
 let statusHairtail = null;
+const borderRadius = 10;
 const levelOfSalesPrice = [0,50,100,200,400,800,1600,3200,6700,11390,19363,32917,55959,95130,
     161721,274926,467375,794538,1350715,2296217,3903568,6636067,11281314,19178234,32602997,
     55425096,94222663,160178528
 ];
-let Price = 150;
 const levelOfUpgradeProbability = [50,97,94,91,88,85,82,79,76,73,70,67,64,61,58,55,52,49,46,43,40,37,34,31,28,25,22,0];
 class Position{
     constructor(x, y){
@@ -62,7 +66,7 @@ class Transform{
     }
 }
 class Hairtail{
-    constructor(posXData, posYData, hairtailLevelData){
+    constructor(posXData, posYData, hairtailLevelData, priceData = 150){
         this.transform = new Transform(posXData, posYData);
         this.data = {hairtailLevel:hairtailLevelData};
         this.object = document.createElement("img");
@@ -71,13 +75,18 @@ class Hairtail{
         hairtailNumber++
         this.object.style.opacity = 1
         this.object.src = `./Image/lv${this.data.hairtailLevel}.webp`;
+        this.data.price = priceData
         hairtailSet.push(this);
         document.body.appendChild(this.object);
         return this
     }
     sell(){
         money += levelOfSalesPrice[this.data.hairtailLevel];
-        hairtailSet.splice(hairtailSet.indexOf(this), 1);
+        this.Delete()
+        moneyUI.style.transform = "scale(1.1)"
+        setTimeout(() => {
+            moneyUI.style.transform = "scale(1)"
+        }, 50);
     }
     getLevel(){
         return `lv${this.data.hairtailLevel}`;
@@ -95,10 +104,29 @@ class Hairtail{
     Upgrade(){
         this.data.hairtailLevel += 1;
         this.object.src = `./Image/lv${this.data.hairtailLevel}.webp`;
+        this.data.price *= 1.3
+        this.object.style.boxShadow = "0px 0px 20px rgba(0, 173, 14, 1)"
+        this.object.style.transform = "scale(1.1)"
+        setTimeout(() => {
+            this.object.style.boxShadow = "box-shadow: 0px 0px 20px rgba(0, 0, 0, 1)"
+            this.object.style.transform = "scale(1)"
+        }, 50);
     }
     Reset(){
         this.data.hairtailLevel = 0;
         this.object.src = `./Image/lv${this.data.hairtailLevel}.webp`;
+        this.data.price = 150
+        this.object.style.boxShadow = "0px 0px 20px rgba(219, 0, 0, 1)"
+        this.object.style.transform = "scale(1.1)"
+        setTimeout(() => {
+            this.object.style.boxShadow = "box-shadow: 0px 0px 20px rgba(0, 0, 0, 1)"
+            this.object.style.transform = "scale(1)"
+        }, 50);
+    }
+    Delete(){
+        hairtailSet.splice(this, 1);
+        this.object.remove();
+        statusHairtail = null;
     }
 }
 settingBoxUI.style.display = "none"
@@ -125,7 +153,7 @@ buttonSet.loadGameButtonUI.object.onclick = () => {
     if (localStorage.getItem("isLoad")){
         let NewSet = JSON.parse(localStorage.getItem("hairtailSet"));
         for (object of NewSet){
-            let hairtailObject = new Hairtail(width * posX, height * posY, 0);
+            let hairtailObject = new Hairtail(width * posX, height * posY, object[0], object[1]);
             hairtailObject.object.addEventListener("click", () => {
             if (!statusHairtail){
                 statusHairtail = hairtailObject;
@@ -158,6 +186,10 @@ buyHairtailButtonUI.onclick = () => {
                 statusHairtail = hairtailObject;
             }
         });
+        moneyUI.style.transform = "scale(1.1)"
+        setTimeout(() => {
+            moneyUI.style.transform = "scale(1)"
+        }, 50);
         posX += 0.07;
         if (posX + 0.07 > 1){
             posY += 0.12
@@ -168,25 +200,57 @@ buyHairtailButtonUI.onclick = () => {
 upgradeEndButtonUI.onclick = () => {
     statusHairtail = null;
 }
+upgradeButtonUI.onclick = () => {
+    if (money >= statusHairtail.data.price){
+        moneyUI.style.transform = "scale(1.1)"
+        setTimeout(() => {
+            moneyUI.style.transform = "scale(1)"
+        }, 50);
+        money -= statusHairtail.data.price;
+        let Random = Math.random() * 100
+        if (Random <= levelOfUpgradeProbability[statusHairtail.data.hairtailLevel]){
+            hairtailImageUI.style.boxShadow = "0px 0px 20px rgba(15, 182, 0, 1)"
+            hairtailImageUI.style.transform = "scale(1.1)"
+            setTimeout(() => {
+                hairtailImageUI.style.boxShadow = "box-shadow: 0px 0px 20px rgba(0, 0, 0, 1)"
+                hairtailImageUI.style.transform = "scale(1)"
+            }, 50);
+            statusHairtail.Upgrade()
+        }else{
+            if (treatmentKit >= statusHairtail.data.hairtailLevel){
+                treatmentKit -= statusHairtail.data.hairtailLevel;
+            }else{
+                hairtailImageUI.style.boxShadow = "0px 0px 20px rgba(224, 0, 0, 1)"
+                hairtailImageUI.style.transform = "scale(1.1)"
+                setTimeout(() => {
+                    hairtailImageUI.style.boxShadow = "box-shadow: 0px 0px 20px rgba(0, 0, 0, 1)"
+                    hairtailImageUI.style.transform = "scale(1)"
+                }, 50);
+                statusHairtail.Reset()
+            }
+        }
+    }
+}
+sellButtonUI.onclick = () => {
+    statusHairtail.sell()
+}
 function InGameLoop(){
+    for (let value of hairtailSet)
+        value.Update();
     let newList = []
     for (object of hairtailSet){
-        newList.push(object.data.hairtailLevel)
+        newList.push([object.data.hairtailLevel, object.data.price])
     }
     localStorage.setItem("hairtailSet", JSON.stringify(newList));
     localStorage.setItem("money", money);
     localStorage.setItem("treatmentKit", treatmentKit);
     requestAnimationFrame(InGameLoop);
 }
-UpdateUI();
 window.addEventListener("resize", () => {
-    width = window.innerWidth;
-    height = window.innerHeight;
-    _buttonTemplate1.width = width / 10;
-    _buttonTemplate1.height = height / 12;
     UpdateUI();
 });
 function Loop(){
+    UpdateUI()
     requestAnimationFrame(Loop);
 }
 function startTutorial(){
@@ -213,6 +277,7 @@ function talk(list){
 }
 function talk_index(index, list){
     if (list[index]){
+        talkBoxServiceUI.style.display = "block";
         talkBoxUI.style.display = "block"
         spanUI.innerHTML = list[index]
         let ifkeep = true;
@@ -221,9 +286,15 @@ function talk_index(index, list){
                 talkBoxUI.style.display = "none"
                 talk_index(index + 1, list);
         });
+    }else{
+        talkBoxServiceUI.style.display = "none";
     }
 }
 function UpdateUI(){
+    width = window.innerWidth;
+    height = window.innerHeight;
+    _buttonTemplate1.width = width / 10;
+    _buttonTemplate1.height = height / 12;
     language = languageSelectUI.value;
     background.style.width = `${width}px`;
     background.style.height = `${height}px`;
@@ -241,8 +312,6 @@ function UpdateUI(){
         object.style.left = `${(width * buttonSet[key].Xpos) - (Number(buttonSet[key].object.style.width.replace("px", "")) / 2)}px`;
         object.style.top = `${(height * buttonSet[key].Ypos) - (Number(buttonSet[key].object.style.height.replace("px", "")) / 2)}px`;
     }
-    for (let value of hairtailSet)
-        value.Update();
     talkBoxUI.style.width = `${width * 0.9}px`;
     talkBoxUI.style.height = `${height * 0.15}px`;
     spanUI.style.fontSize = `${Number(talkBoxUI.style.width.replace("px", "")) / spanUI.textContent.length+10}px`;
@@ -266,7 +335,7 @@ function UpdateUI(){
     settingEndButtonUI.style.width = `${width * 0.2}px`;
     settingEndButtonUI.style.height = `${height * 0.05}px`;
     settingEndButtonUI.style.fontSize = `${height * 0.04}px`;
-    moneyUI.innerHTML = `$${money}`;
+    moneyUI.innerHTML = `$${Math.floor(money)}`;
     moneyUI.style.fontSize = `${height * 0.05}px`;
     moneyUI.style.left = `${0}px`;
     moneyUI.style.top = `${0}px`;
@@ -297,6 +366,18 @@ function UpdateUI(){
     hairtailImageUI.style.top = `${0}px`;
     hairtailImageUI.style.width = `${width * 0.07}px`;
     hairtailImageUI.style.height = `${width * 0.07}px`;
+    talkBoxServiceUI.style.width = `${width}px`;
+    talkBoxServiceUI.style.height = `${height}px`;    
+    upgradeButtonUI.style.top = `${height * 0.03 + width * 0.07}px`
+    sellButtonUI.style.top = `${height * 0.03 + width * 0.07}px`
+    upgradeButtonUI.style.left = `${width * 0.05}px`
+    sellButtonUI.style.left = `${width * 0.1}px`
+    upgradeButtonUI.style.height = `${height * 0.05}px`
+    sellButtonUI.style.height = `${height * 0.05}px`
+    upgradeButtonUI.style.width = `${width * 0.05}px`
+    sellButtonUI.style.width = `${width * 0.05}px`
+    upgradeButtonUI.style.fontSize = `${height * 0.02}px`
+    sellButtonUI.style.fontSize = `${height * 0.02}px`
     switch (language){
         case "한국어":
             buttonSet.newGameButtonUI.object.textContent = "새 게임";
@@ -306,6 +387,8 @@ function UpdateUI(){
             buyHairtailButtonUI.innerHTML = `갈치 입양($${eggPrice})`
             settingEndButtonUI.innerHTML = `종료`
             upgradeEndButtonUI.innerHTML = `종료`
+            upgradeButtonUI.innerHTML = `강화`
+            sellButtonUI.innerHTML = `판매`
             break;
         case "English":
             buttonSet.newGameButtonUI.object.textContent = "New Game";
@@ -315,6 +398,8 @@ function UpdateUI(){
             buyHairtailButtonUI.innerHTML = `buy Hairtail($${eggPrice})`
             settingEndButtonUI.innerHTML = `End`
             upgradeEndButtonUI.innerHTML = `End`
+            upgradeButtonUI.innerHTML = `Upgrade`
+            sellButtonUI.innerHTML = `Sell`
     }
     if (statusHairtail){
         upgradeHairtailUI.style.display = "block"
@@ -323,8 +408,12 @@ function UpdateUI(){
     else{
         upgradeHairtailUI.style.display = "none"
     }
+    for (let elements of isClassButtonElement){
+        elements.style.borderRadius = `${elements.style.width.replace("px", "") / borderRadius}px`;
+    }
 }
 function StartGame(){
+    UpdateUI();
     background.style.opacity = 0.5;
     LobbyButtonSetUI.style.display = "none";
     moneyUI.style.display = "block";
@@ -332,7 +421,6 @@ function StartGame(){
     buyHairtailButtonUI.style.display = "block"
     InGameLoop();
 }
-
+UpdateUI()
 Loop();
-
 
