@@ -250,7 +250,6 @@ window.addEventListener("resize", () => {
     UpdateUI();
 });
 function Loop(){
-    UpdateUI()
     requestAnimationFrame(Loop);
 }
 function startTutorial(){
