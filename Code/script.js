@@ -246,9 +246,11 @@ function InGameLoop(){
     localStorage.setItem("treatmentKit", treatmentKit);
     requestAnimationFrame(InGameLoop);
 }
+/*
 window.addEventListener("resize", () => {
     UpdateUI();
 });
+*/
 function Loop(){
     requestAnimationFrame(Loop);
 }
