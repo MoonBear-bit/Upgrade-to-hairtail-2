@@ -16,6 +16,8 @@ let hairtailImageUI = document.getElementById("hairtailImage");
 let upgradeEndButtonUI = document.getElementById("UpgradeEnd");
 let upgradeButtonUI = document.getElementById("UpgradeButton");
 let sellButtonUI = document.getElementById("SellButton")
+let missionButtonUI = document.getElementById("MissionButton");
+let missionUI = document.getElementById("MissionCanvas");
 let isClassButtonElement = [...document.querySelectorAll(".button")];
 let buttonSet = {
     loadGameButtonUI: {object:document.getElementById("LoadGame"), type:"Button 1", Xpos:0.5, Ypos:0.5},
@@ -234,7 +236,40 @@ upgradeButtonUI.onclick = () => {
 sellButtonUI.onclick = () => {
     statusHairtail.sell()
 }
+missionButtonUI.onclick = () => {
+    if (missionUI.style.display == "none"){
+        missionUI.style.display = "block"
+    }else[
+        missionUI.style.display = "none"
+    ]
+}
 function InGameLoop(){
+    moneyUI.innerHTML = `$${Math.floor(money)}`;
+    switch (language){
+        case "한국어":
+            buttonSet.newGameButtonUI.object.textContent = "새 게임";
+            buttonSet.loadGameButtonUI.object.textContent = "게임 계속하기";
+            buttonSet.settingButtonUI.object.textContent = "환경 설정";
+            treatmentKitUI.innerHTML = `치료 키트: ${treatmentKit}개`;
+            buyHairtailButtonUI.innerHTML = `갈치 입양($${eggPrice})`
+            settingEndButtonUI.innerHTML = `종료`
+            upgradeEndButtonUI.innerHTML = `종료`
+            upgradeButtonUI.innerHTML = `강화`
+            sellButtonUI.innerHTML = `판매`
+            missionButtonUI.innerHTML = `업적`
+            break;
+        case "English":
+            buttonSet.newGameButtonUI.object.textContent = "New Game";
+            buttonSet.loadGameButtonUI.object.textContent = "Load Game";
+            buttonSet.settingButtonUI.object.textContent = "Setting";
+            treatmentKitUI.innerHTML = `Treatment Kit: ${treatmentKit}`;
+            buyHairtailButtonUI.innerHTML = `buy Hairtail($${eggPrice})`
+            settingEndButtonUI.innerHTML = `End`
+            upgradeEndButtonUI.innerHTML = `End`
+            upgradeButtonUI.innerHTML = `Upgrade`
+            sellButtonUI.innerHTML = `Sell`
+            missionButtonUI.innerHTML = `Mission`
+    }
     for (let value of hairtailSet)
         value.Update();
     let newList = []
@@ -246,12 +281,14 @@ function InGameLoop(){
     localStorage.setItem("treatmentKit", treatmentKit);
     requestAnimationFrame(InGameLoop);
 }
-/*
-window.addEventListener("resize", () => {
-    UpdateUI();
-});
-*/
 function Loop(){
+    if (statusHairtail){
+        upgradeHairtailUI.style.display = "block"
+        hairtailImageUI.src = statusHairtail.object.src
+    }
+    else{
+        upgradeHairtailUI.style.display = "none"
+    }
     requestAnimationFrame(Loop);
 }
 function startTutorial(){
@@ -336,7 +373,6 @@ function UpdateUI(){
     settingEndButtonUI.style.width = `${width * 0.2}px`;
     settingEndButtonUI.style.height = `${height * 0.05}px`;
     settingEndButtonUI.style.fontSize = `${height * 0.04}px`;
-    moneyUI.innerHTML = `$${Math.floor(money)}`;
     moneyUI.style.fontSize = `${height * 0.05}px`;
     moneyUI.style.left = `${0}px`;
     moneyUI.style.top = `${0}px`;
@@ -379,36 +415,15 @@ function UpdateUI(){
     sellButtonUI.style.width = `${width * 0.05}px`
     upgradeButtonUI.style.fontSize = `${height * 0.02}px`
     sellButtonUI.style.fontSize = `${height * 0.02}px`
-    switch (language){
-        case "한국어":
-            buttonSet.newGameButtonUI.object.textContent = "새 게임";
-            buttonSet.loadGameButtonUI.object.textContent = "게임 계속하기";
-            buttonSet.settingButtonUI.object.textContent = "환경 설정";
-            treatmentKitUI.innerHTML = `치료 키트: ${treatmentKit}개`;
-            buyHairtailButtonUI.innerHTML = `갈치 입양($${eggPrice})`
-            settingEndButtonUI.innerHTML = `종료`
-            upgradeEndButtonUI.innerHTML = `종료`
-            upgradeButtonUI.innerHTML = `강화`
-            sellButtonUI.innerHTML = `판매`
-            break;
-        case "English":
-            buttonSet.newGameButtonUI.object.textContent = "New Game";
-            buttonSet.loadGameButtonUI.object.textContent = "Load Game";
-            buttonSet.settingButtonUI.object.textContent = "Setting";
-            treatmentKitUI.innerHTML = `Treatment Kit: ${treatmentKit}`;
-            buyHairtailButtonUI.innerHTML = `buy Hairtail($${eggPrice})`
-            settingEndButtonUI.innerHTML = `End`
-            upgradeEndButtonUI.innerHTML = `End`
-            upgradeButtonUI.innerHTML = `Upgrade`
-            sellButtonUI.innerHTML = `Sell`
-    }
-    if (statusHairtail){
-        upgradeHairtailUI.style.display = "block"
-        hairtailImageUI.src = statusHairtail.object.src
-    }
-    else{
-        upgradeHairtailUI.style.display = "none"
-    }
+    missionUI.style.top = `${0}px`;
+    missionUI.style.left = `${width * 0.5}px`;
+    missionUI.style.height = `${height}px`;
+    missionUI.style.width = `${width * 0.5}px`;
+    missionButtonUI.style.height = `${height * 0.07}px`;
+    missionButtonUI.style.width = `${width * 0.14}px`;
+    missionButtonUI.style.fontSize = `${Number(missionButtonUI.style.width.replace("px", "")) / missionButtonUI.textContent.length + 10}px`;
+    missionButtonUI.style.left = `${width * 0.84}px`;
+    missionButtonUI.style.top = `${height * 0.9}px`;
     for (let elements of isClassButtonElement){
         elements.style.borderRadius = `${elements.style.width.replace("px", "") / borderRadius}px`;
     }
@@ -420,6 +435,7 @@ function StartGame(){
     moneyUI.style.display = "block";
     treatmentKitUI.style.display = "block";
     buyHairtailButtonUI.style.display = "block"
+    missionButtonUI.style.display = "block"
     InGameLoop();
 }
 UpdateUI()

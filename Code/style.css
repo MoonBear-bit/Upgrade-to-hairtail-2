@@ -104,3 +104,10 @@ body{
 .hairtailImage{
     box-shadow: 0px 0px 30px black;
 }
+.MissionCanvas{
+    position: absolute;
+    border-radius: 10px;
+    background-color: white;
+    z-index: 99;
+    border: 3px solid black;
+}
