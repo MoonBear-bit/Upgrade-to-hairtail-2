@@ -18,6 +18,7 @@ let upgradeButtonUI = document.getElementById("UpgradeButton");
 let sellButtonUI = document.getElementById("SellButton")
 let missionButtonUI = document.getElementById("MissionButton");
 let missionUI = document.getElementById("MissionCanvas");
+let mouseFollowUI = document.getElementById("MouseFollower")
 let isClassButtonElement = [...document.querySelectorAll(".button")];
 let buttonSet = {
     loadGameButtonUI: {object:document.getElementById("LoadGame"), type:"Button 1", Xpos:0.5, Ypos:0.5},
@@ -30,6 +31,7 @@ let _buttonTemplate1 = {
     width: "0px",
     height: "0px"
 }
+let museumSet = [];
 let hairtailSet = [];
 let money = 50000;
 let treatmentKit = 0;
@@ -42,12 +44,39 @@ let posX = 0.2;
 let posY = 0.3;
 let eggPrice = 1000;
 let statusHairtail = null;
+let X = 0;
+let Y = 0;
+let missionList = [
+    {
+        name: {korean: "단단한 갈치", english: "Solid hairtail"},
+        value: {korean: "lv12 텅스텐 갈치에 도달하시오", english: "Reach lv12 tungsten hairtail"},
+        successCondition: function(){
+            for (let object of hairtailSet){
+                if (object.data.hairtailLevel == 12){
+                    return true;
+                }
+            }
+            return false;
+        },
+        isSuccess: false
+    }
+]
 const borderRadius = 10;
 const levelOfSalesPrice = [0,50,100,200,400,800,1600,3200,6700,11390,19363,32917,55959,95130,
     161721,274926,467375,794538,1350715,2296217,3903568,6636067,11281314,19178234,32602997,
     55425096,94222663,160178528
 ];
 const levelOfUpgradeProbability = [50,97,94,91,88,85,82,79,76,73,70,67,64,61,58,55,52,49,46,43,40,37,34,31,28,25,22,0];
+const hairtailName = [{english:"egg",korean:"알"},{english:"baby hairtail",korean:"새끼 갈치"},{english:"young hairtail",korean:"어린 갈치"}
+    ,{english:"hairtail",korean:"갈치"},{english:"rock hairtail",korean:"돌 갈치"},{english:"steel hairtail",korean:"철 갈치"},{english:"silver hairtail",korean:"은 갈치"}
+    ,{english:"gold hairtail",korean:"금 갈치"},{english:"sapphire hairtail",korean:"사파이어 갈치"},{english:"ruby hairtail",korean:"루비 갈치"},{english:"titanium hairtail",korean:"티타늄 갈치"}
+    ,{english:"diamond hairtail",korean:"다이아몬드 갈치"},{english:"tungsten hairtail",korean:"텅스텐 갈치"},{english:"uranium hairtail",korean:"우라늄 갈치"}
+    ,{english:"super hairtail",korean:"초월적인 갈치"},{english:"crazy hairtail",korean:"미친 갈치"},{english:"old hairtail",korean:"노인 갈치"}
+    ,{english:"rich hairtail",korean:"금품갈치"},{english:"semiconductor hairtail",korean:"반도체 갈치"},{english:"slice hairtail",korean:"자른 갈치"}
+    ,{english:"frozen hairtail",korean:"냉동 갈치"},{english:"grilled hairtail",korean:"구운 갈치"},{english:"zombie hairtail",korean:"좀비 갈치"}
+    ,{english:"rifle hairtail",korean:"총 갈치"},{english:"sniper hairtail",korean:"저격수 갈치"},{english:"space hairtail",korean:"우주 갈치"}
+    ,{english:"planet hairtail",korean:"행성 갈치"},{english:"earth hairtail",korean:"지구 갈치"}
+]
 class Position{
     constructor(x, y){
         this.x_ = x;
@@ -78,6 +107,19 @@ class Hairtail{
         this.object.style.opacity = 1
         this.object.src = `./Image/lv${this.data.hairtailLevel}.webp`;
         this.data.price = priceData
+        this.object.addEventListener("mouseenter",() => {
+            mouseFollowUI.style.display = "block"
+            switch(language){
+                case "English":
+                    mouseFollowUI.innerHTML = `lv${this.data.hairtailLevel} ${hairtailName[this.data.hairtailLevel].english}`
+                    break;
+                case "한국어":
+                    mouseFollowUI.innerHTML = `${this.data.hairtailLevel}강 ${hairtailName[this.data.hairtailLevel].korean}`
+            }
+        })
+        this.object.addEventListener("mouseleave",() => {
+            mouseFollowUI.style.display = "none"
+        })
         hairtailSet.push(this);
         document.body.appendChild(this.object);
         return this
@@ -126,7 +168,7 @@ class Hairtail{
         }, 50);
     }
     Delete(){
-        hairtailSet.splice(this, 1);
+        hairtailSet.splice(hairtailSet.indexOf(this), 1);
         this.object.remove();
         statusHairtail = null;
     }
@@ -153,6 +195,7 @@ buttonSet.loadGameButtonUI.object.onclick = () => {
     posX = 0.2;
     posY = 0.3;
     if (localStorage.getItem("isLoad")){
+        museumSet = JSON.parse(localStorage.getItem("museumSet"))
         let NewSet = JSON.parse(localStorage.getItem("hairtailSet"));
         for (object of NewSet){
             let hairtailObject = new Hairtail(width * posX, height * posY, object[0], object[1]);
@@ -243,20 +286,55 @@ missionButtonUI.onclick = () => {
         missionUI.style.display = "none"
     ]
 }
+hairtailCanvasUI.addEventListener("mouseenter",() => {
+    mouseFollowUI.style.display = "block"
+    switch(language){
+            case "English":
+                mouseFollowUI.innerHTML = `lv${statusHairtail.data.hairtailLevel} ${hairtailName[statusHairtail.data.hairtailLevel].english}`
+                break;
+            case "한국어":
+                mouseFollowUI.innerHTML = `${statusHairtail.data.hairtailLevel}강 ${hairtailName[statusHairtail.data.hairtailLevel].korean}`
+    }
+})
+hairtailCanvasUI.addEventListener("mouseleave",() => {
+    mouseFollowUI.style.display = "none"
+})
+document.addEventListener("mousemove", (event) => {
+    X = event.pageX
+    Y = event.pageY
+})
 function InGameLoop(){
+    mouseFollowUI.style.fontSize = `${height * 0.025}px`
+    mouseFollowUI.style.height = `${height * 0.075}px`
+    mouseFollowUI.style.width = `${width * 0.2}px`
+    mouseFollowUI.style.top = `${Y + 10}px`
+    mouseFollowUI.style.left = `${X + 10}px`
     moneyUI.innerHTML = `$${Math.floor(money)}`;
+    for (let value of hairtailSet)
+        value.Update();
+    let newList = []
+    for (object of hairtailSet){
+        newList.push([object.data.hairtailLevel, object.data.price])
+    }
+    localStorage.setItem("museumSet", JSON.stringify(museumSet));
+    localStorage.setItem("hairtailSet", JSON.stringify(newList));
+    localStorage.setItem("money", money);
+    localStorage.setItem("treatmentKit", treatmentKit);
+    requestAnimationFrame(InGameLoop);
+}
+function Loop(){
     switch (language){
         case "한국어":
             buttonSet.newGameButtonUI.object.textContent = "새 게임";
             buttonSet.loadGameButtonUI.object.textContent = "게임 계속하기";
             buttonSet.settingButtonUI.object.textContent = "환경 설정";
             treatmentKitUI.innerHTML = `치료 키트: ${treatmentKit}개`;
-            buyHairtailButtonUI.innerHTML = `갈치 입양($${eggPrice})`
+            buyHairtailButtonUI.innerHTML = `_갈치 입양($${eggPrice})_`
             settingEndButtonUI.innerHTML = `종료`
             upgradeEndButtonUI.innerHTML = `종료`
             upgradeButtonUI.innerHTML = `강화`
             sellButtonUI.innerHTML = `판매`
-            missionButtonUI.innerHTML = `업적`
+            missionButtonUI.innerHTML = `___업적___`
             break;
         case "English":
             buttonSet.newGameButtonUI.object.textContent = "New Game";
@@ -270,18 +348,16 @@ function InGameLoop(){
             sellButtonUI.innerHTML = `Sell`
             missionButtonUI.innerHTML = `Mission`
     }
-    for (let value of hairtailSet)
-        value.Update();
-    let newList = []
-    for (object of hairtailSet){
-        newList.push([object.data.hairtailLevel, object.data.price])
-    }
-    localStorage.setItem("hairtailSet", JSON.stringify(newList));
-    localStorage.setItem("money", money);
-    localStorage.setItem("treatmentKit", treatmentKit);
-    requestAnimationFrame(InGameLoop);
-}
-function Loop(){
+    spanUI.style.fontSize = `${Number(talkBoxUI.style.width.replace("px", "")) / spanUI.textContent.length+10}px`;
+    languageSelectUI.style.fontSize = `${height * 0.04}px`;
+    settingEndButtonUI.style.fontSize = `${height * 0.04}px`;
+    moneyUI.style.fontSize = `${height * 0.05}px`;
+    treatmentKitUI.style.fontSize = `${height * 0.04}px`;
+    upgradeEndButtonUI.style.fontSize = `${height * 0.04}px`;
+    upgradeButtonUI.style.fontSize = `${height * 0.02}px`
+    sellButtonUI.style.fontSize = `${height * 0.02}px`
+    buyHairtailButtonUI.style.fontSize = `${Number(buyHairtailButtonUI.style.width.replace("px", "")) / buyHairtailButtonUI.textContent.length + 10}px`;
+    missionButtonUI.style.fontSize = `${Number(missionButtonUI.style.width.replace("px", "")) / missionButtonUI.textContent.length + 10}px`;
     if (statusHairtail){
         upgradeHairtailUI.style.display = "block"
         hairtailImageUI.src = statusHairtail.object.src
@@ -352,7 +428,6 @@ function UpdateUI(){
     }
     talkBoxUI.style.width = `${width * 0.9}px`;
     talkBoxUI.style.height = `${height * 0.15}px`;
-    spanUI.style.fontSize = `${Number(talkBoxUI.style.width.replace("px", "")) / spanUI.textContent.length+10}px`;
     talkBoxUI.style.left = `${width * 0.05}px`;
     talkBoxUI.style.top = `${height * 0.75}px`;
     wormUI.style.width = `${width * 0.15}px`;
@@ -363,7 +438,6 @@ function UpdateUI(){
     languageSelectUI.style.top = `${height * 0.01}px`;
     languageSelectUI.style.width = `${width * 0.15}px`;
     languageSelectUI.style.height = `${height * 0.06}px`;
-    languageSelectUI.style.fontSize = `${height * 0.04}px`;
     settingBoxUI.style.left = `${width * 0.4}px`;
     settingBoxUI.style.top = `${height * 0.35}px`;
     settingBoxUI.style.width = `${width * 0.2}px`;
@@ -372,18 +446,14 @@ function UpdateUI(){
     settingEndButtonUI.style.top = `${height * 0.25}px`;
     settingEndButtonUI.style.width = `${width * 0.2}px`;
     settingEndButtonUI.style.height = `${height * 0.05}px`;
-    settingEndButtonUI.style.fontSize = `${height * 0.04}px`;
-    moneyUI.style.fontSize = `${height * 0.05}px`;
     moneyUI.style.left = `${0}px`;
     moneyUI.style.top = `${0}px`;
     moneyUI.style.width = `${width}px`;
-    treatmentKitUI.style.fontSize = `${height * 0.04}px`;
     treatmentKitUI.style.left = `${0}px`;
     treatmentKitUI.style.top = `${height * 0.05}px`;
     treatmentKitUI.style.width = `${width}px`;
     buyHairtailButtonUI.style.height = `${height * 0.07}px`;
     buyHairtailButtonUI.style.width = `${width * 0.17}px`;
-    buyHairtailButtonUI.style.fontSize = `${Number(buyHairtailButtonUI.style.width.replace("px", "")) / buyHairtailButtonUI.textContent.length + 10}px`;
     buyHairtailButtonUI.style.left = `${0}px`;
     buyHairtailButtonUI.style.top = `${height * 0.1}px`;
     upgradeHairtailUI.style.left = `${width * 0.4}px`;
@@ -394,7 +464,6 @@ function UpdateUI(){
     upgradeEndButtonUI.style.top = `${height * 0.25}px`;
     upgradeEndButtonUI.style.width = `${width * 0.2}px`;
     upgradeEndButtonUI.style.height = `${height * 0.05}px`;
-    upgradeEndButtonUI.style.fontSize = `${height * 0.04}px`;
     hairtailCanvasUI.style.left = `${width * 0.065}px`;
     hairtailCanvasUI.style.top = `${height * 0.015}px`;
     hairtailCanvasUI.style.width = `${width * 0.07}px`;
@@ -413,15 +482,12 @@ function UpdateUI(){
     sellButtonUI.style.height = `${height * 0.05}px`
     upgradeButtonUI.style.width = `${width * 0.05}px`
     sellButtonUI.style.width = `${width * 0.05}px`
-    upgradeButtonUI.style.fontSize = `${height * 0.02}px`
-    sellButtonUI.style.fontSize = `${height * 0.02}px`
     missionUI.style.top = `${0}px`;
     missionUI.style.left = `${width * 0.5}px`;
     missionUI.style.height = `${height}px`;
     missionUI.style.width = `${width * 0.5}px`;
     missionButtonUI.style.height = `${height * 0.07}px`;
     missionButtonUI.style.width = `${width * 0.14}px`;
-    missionButtonUI.style.fontSize = `${Number(missionButtonUI.style.width.replace("px", "")) / missionButtonUI.textContent.length + 10}px`;
     missionButtonUI.style.left = `${width * 0.84}px`;
     missionButtonUI.style.top = `${height * 0.9}px`;
     for (let elements of isClassButtonElement){
@@ -429,13 +495,13 @@ function UpdateUI(){
     }
 }
 function StartGame(){
-    UpdateUI();
     background.style.opacity = 0.5;
     LobbyButtonSetUI.style.display = "none";
     moneyUI.style.display = "block";
     treatmentKitUI.style.display = "block";
     buyHairtailButtonUI.style.display = "block"
     missionButtonUI.style.display = "block"
+    UpdateUI();
     InGameLoop();
 }
 UpdateUI()
