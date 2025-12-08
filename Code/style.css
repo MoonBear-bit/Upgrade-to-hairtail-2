@@ -111,6 +111,13 @@ body{
     z-index: 99;
     border: 3px solid black;
 }
+.Missions{
+    position: absolute;
+    border-radius: 10px;
+    background-color: white;
+    z-index: 110;
+    border: 3px solid black;
+}
 .mouseFollower{
     position: absolute;
     font-weight: bold;
