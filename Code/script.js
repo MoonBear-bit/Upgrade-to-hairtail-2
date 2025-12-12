@@ -105,7 +105,7 @@ class Transform{
     }
 }
 class Hairtail{
-    constructor(posXData, posYData, hairtailLevelData, priceData = 150){
+    constructor(posXData, posYData, hairtailLevelData, priceData){
         this.transform = new Transform(posXData, posYData);
         this.data = {hairtailLevel:hairtailLevelData};
         this.object = document.createElement("img");
@@ -113,6 +113,8 @@ class Hairtail{
         this.object.id = "hairtail" + hairtailNumber
         hairtailNumber++
         this.object.style.opacity = 1
+        this.object.style.left = this.transform.position.x
+        this.object.style.top = this.transform.position.y
         this.object.src = `./Image/lv${this.data.hairtailLevel}.webp`;
         this.data.price = priceData
         this.object.addEventListener("mouseenter",() => {
@@ -174,9 +176,33 @@ class Hairtail{
         }, 50);
     }
     Delete(){
+        hairtailNumber = 0;
         hairtailSet.splice(hairtailSet.indexOf(this), 1);
         this.object.remove();
         statusHairtail = null;
+        for(let object of hairtailSet){
+            object.object.remove();
+        }
+        posX = 0.2
+        posY = 0.3
+        let NewSet = []
+        for (object of hairtailSet){
+            NewSet.push([object.data.hairtailLevel, object.data.price])
+        }
+        hairtailSet = []
+        for (object of NewSet){
+            let hairtailObject = new Hairtail(width * posX, height * posY, object[0], object[1]);
+            hairtailObject.object.addEventListener("click", () => {
+            if (!statusHairtail){
+                statusHairtail = hairtailObject;
+            }
+        });
+        posX += 0.07;
+        if (posX + 0.07 > 1){
+            posY += 0.12
+            posX = 0.2
+        }
+        }
     }
 }
 class Missions{
@@ -286,7 +312,7 @@ buyHairtailButtonUI.onclick = () => {
     if (hairtailSet.length < 55 && money > eggPrice){
         money -= eggPrice;
         eggPrice += Math.floor(Math.random() * 20) - 10
-        let hairtailObject = new Hairtail(width * posX, height * posY, 0);
+        let hairtailObject = new Hairtail(width * posX, height * posY, 0, 150);
         hairtailObject.object.addEventListener("click", () => {
             if (!statusHairtail){
                 statusHairtail = hairtailObject;
