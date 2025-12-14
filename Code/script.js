@@ -51,7 +51,7 @@ let statusHairtail = null;
 let X = 0;
 let Y = 0;
 let missionList = [
-    {
+    {//0
         name: {korean: "단단한 갈치", english: "Solid hairtail"},
         value: {korean: "lv12 텅스텐 갈치에 도달하시오", english: "Reach lv12 tungsten hairtail "},
         resultValue: "$55000",
@@ -68,7 +68,7 @@ let missionList = [
             money += 55000
         }
     },
-    {
+    {//1
         name: {korean: "의사", english: "Doctor"},
         value: {korean: "치료 키트를 50개 소지하세요", english: "Have 50 treatmentKits "},
         resultValue: "$150000",
@@ -81,6 +81,22 @@ let missionList = [
         isSuccess: false,
         result: function(){
             money += 150000
+        }
+    },
+    {//2
+        name: {korean: "갈치 의사", english: "Hairtail Doctor"},
+        value: {korean: "갈치를 치료하세요", english: "Treat the hairtail "},
+        resultValue: "180000",
+        isSuccessCondition: false,
+        successCondition: function(){
+            if (this.isSuccessCondition){
+                return true;
+            }
+            return false;
+        },
+        isSuccess: false,
+        result: function(){
+            money += 80000
         }
     },
 ]
@@ -391,6 +407,8 @@ upgradeButtonUI.onclick = () => {
             statusHairtail.Upgrade()
         }else{
             if (treatmentKit >= statusHairtail.data.hairtailLevel){
+                if (statusHairtail.data.hairtailLevel >= 1)
+                    missionList[2].isSuccessCondition = true
                 treatmentKit -= statusHairtail.data.hairtailLevel;
                 treatmentKitUI.style.transform = "scale(1.1)"
                 hairtailImageUI.style.boxShadow = "0px 0px 20px rgba(255, 187, 0, 1)"
