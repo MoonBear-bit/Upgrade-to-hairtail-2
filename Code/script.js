@@ -46,15 +46,15 @@ let hairtailNumber = 0;
 let missionNumber = 0;
 let posX = 0.2;
 let posY = 0.3;
-let eggPrice = 1000;
+let eggPrice = 450;
 let statusHairtail = null;
 let X = 0;
 let Y = 0;
 let missionList = [
     {
         name: {korean: "단단한 갈치", english: "Solid hairtail"},
-        value: {korean: "lv12 텅스텐 갈치에 도달하시오", english: "Reach lv12 tungsten hairtail"},
-        resultValue: "$7500",
+        value: {korean: "lv12 텅스텐 갈치에 도달하시오", english: "Reach lv12 tungsten hairtail "},
+        resultValue: "$55000",
         successCondition: function(){
             for (let object of hairtailSet){
                 if (object.data.hairtailLevel == 12){
@@ -65,9 +65,24 @@ let missionList = [
         },
         isSuccess: false,
         result: function(){
-            money += 7500
+            money += 55000
         }
-    }
+    },
+    {
+        name: {korean: "의사", english: "Doctor"},
+        value: {korean: "치료 키트를 50개 소지하세요", english: "Have 50 treatmentKits "},
+        resultValue: "$150000",
+        successCondition: function(){
+            if (treatmentKit >= 50){
+                return true;
+            }
+            return false;
+        },
+        isSuccess: false,
+        result: function(){
+            money += 150000
+        }
+    },
 ]
 const borderRadius = 10;
 const levelOfSalesPrice = [0,50,100,200,400,800,1600,3200,6700,11390,19363,32917,55959,95130,
@@ -156,7 +171,7 @@ class Hairtail{
     Upgrade(){
         this.data.hairtailLevel += 1;
         this.object.src = `./Image/lv${this.data.hairtailLevel}.webp`;
-        this.data.price *= 1.3
+        this.data.price *= 1.25
         this.object.style.boxShadow = "0px 0px 20px rgba(0, 173, 14, 1)"
         this.object.style.transform = "scale(1.1)"
         setTimeout(() => {
@@ -230,7 +245,7 @@ class Missions{
             this.object.style.transform = "scale(1)"
         })
         this.object.addEventListener("click", () => {
-            if (this.data.successCondition()){
+            if (this.data.successCondition() && !this.data.isSuccess){
                 this.success()
             }
         })
@@ -248,10 +263,21 @@ class Missions{
         this.object.style.width = `${(width + height) / 2 * 0.1}px`
         this.object.style.top = `${this.transform.position.y.replace("px","") - Number(this.object.style.height.replace("px", ""))}px`
         this.object.style.left = `${this.transform.position.x.replace("px","") - Number(this.object.style.width.replace("px", ""))}px`
+        this.object.style.fontSize = `${Number(this.object.style.width.replace("px", "")) / this.object.innerHTML.length + 15}px`;
+        switch (language){
+            case "English":
+                this.object.innerHTML = this.data.name.english
+                break;
+            case "한국어":
+                this.object.innerHTML = this.data.name.korean
+        }
         if (this.data.successCondition()){
             this.object.style.boxShadow = "0px 0px 25px rgba(0, 173, 14, 1)"
         }else{
             this.object.style.boxShadow = "none"
+        }
+        if (this.data.isSuccess){
+            this.object.style.backgroundColor = "darkgray"
         }
         
     }
@@ -416,6 +442,9 @@ document.addEventListener("mousemove", (event) => {
     Y = event.pageY
 })
 function InGameLoop(){
+    for (object of MissionsSet){
+        object.object.style.display = missionUI.style.display   
+    }
     mouseFollowUI.style.fontSize = `${height * 0.025}px`
     mouseFollowUI.style.height = `${height * 0.16}px`
     mouseFollowUI.style.width = `${width * 0.2}px`
@@ -423,6 +452,8 @@ function InGameLoop(){
     mouseFollowUI.style.left = `${X + 10}px`
     moneyUI.innerHTML = `$${Math.floor(money)}`;
     for (let value of hairtailSet)
+        value.Update();
+    for (let value of MissionsSet)
         value.Update();
     let newMissionList = []
     for (object of missionList){
@@ -448,7 +479,7 @@ function Loop(){
             treatmentKitUI.innerHTML = `치료 키트: ${treatmentKit}개`;
             buyHairtailButtonUI.innerHTML = `_갈치 입양($${eggPrice})_`
             buyTreatmentKitButtonUI.innerHTML = `치료키트 구매($5000)`
-            buyTreatmentKitButtonUI.innerHTML = `도박하기!(2~0배)`
+            gamblingButtonUI.innerHTML = `도박하기!(2~0배)`
             settingEndButtonUI.innerHTML = `종료`
             upgradeEndButtonUI.innerHTML = `종료`
             upgradeButtonUI.innerHTML = `강화`
@@ -634,6 +665,18 @@ function StartGame(){
     buyTreatmentKitButtonUI.style.display = "block"
     gamblingButtonUI.style.display = "block"
     missionButtonUI.style.display = "block"
+    let newPosX = 0.62;
+    let newPosY = 0.3;
+    for (object of missionList){
+        let missionObject = new Missions(width * newPosX, height * newPosY, object);
+        missionObject.object.addEventListener("click", () => {
+    });
+    newPosX += 0.1;
+    if (newPosX + 0.1 > 1){
+        newPosY += 0.12
+        newPosX = 0.62
+    }
+    }
     UpdateUI();
     InGameLoop();
 }

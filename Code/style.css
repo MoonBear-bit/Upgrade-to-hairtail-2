@@ -116,7 +116,11 @@ body{
     border-radius: 10px;
     background-color: white;
     z-index: 110;
+    display: none;
     border: 3px solid black;
+    text-align: center;
+    align-content: center;
+    font-weight: bold;
 }
 .mouseFollower{
     position: absolute;
