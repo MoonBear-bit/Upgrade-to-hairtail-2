@@ -33,7 +33,6 @@ let _buttonTemplate1 = {
     width: "0px",
     height: "0px"
 }
-let museumSet = [];
 let hairtailSet = [];
 let MissionsSet = [];
 let money = 50000;
@@ -57,7 +56,7 @@ let missionList = [
         resultValue: "$55000",
         successCondition: function(){
             for (let object of hairtailSet){
-                if (object.data.hairtailLevel == 12){
+                if (!this.isSuccess && object.data.hairtailLevel == 12){
                     return true;
                 }
             }
@@ -73,7 +72,7 @@ let missionList = [
         value: {korean: "치료 키트를 50개 소지하세요", english: "Have 50 treatmentKits "},
         resultValue: "$150000",
         successCondition: function(){
-            if (treatmentKit >= 50){
+            if (!this.isSuccess && treatmentKit >= 50){
                 return true;
             }
             return false;
@@ -86,10 +85,10 @@ let missionList = [
     {//2
         name: {korean: "갈치 의사", english: "Hairtail Doctor"},
         value: {korean: "갈치를 치료하세요", english: "Treat the hairtail "},
-        resultValue: "180000",
+        resultValue: "$80000",
         isSuccessCondition: false,
         successCondition: function(){
-            if (this.isSuccessCondition){
+            if (!this.isSuccess && this.isSuccessCondition){
                 return true;
             }
             return false;
@@ -97,6 +96,22 @@ let missionList = [
         isSuccess: false,
         result: function(){
             money += 80000
+        }
+    },
+    {//3
+        name: {korean: "내 모든 것을 걸고", english: "I'm risking my everything"},
+        value: {korean: "도박을 통해 돈을 늘리세요", english: "Gamble. Grow your money "},
+        resultValue: "$40000",
+        isSuccessCondition: false,
+        successCondition: function(){
+            if (!this.isSuccess && this.isSuccessCondition){
+                return true;
+            }
+            return false;
+        },
+        isSuccess: false,
+        result: function(){
+            money += 40000
         }
     },
 ]
@@ -261,7 +276,7 @@ class Missions{
             this.object.style.transform = "scale(1)"
         })
         this.object.addEventListener("click", () => {
-            if (this.data.successCondition() && !this.data.isSuccess){
+            if (this.data.successCondition()){
                 this.success()
             }
         })
@@ -319,12 +334,11 @@ buttonSet.newGameButtonUI.object.onclick = () => {
 buttonSet.loadGameButtonUI.object.onclick = () => {
     posX = 0.2;
     posY = 0.3;
-    let newMissionList = localStorage.getItem("missionList")
+    let newMissionList = JSON.parse(localStorage.getItem("missionList"))
     for (let object of missionList){
         object.isSuccess = newMissionList[missionList.indexOf(object)]
     }
     if (localStorage.getItem("isLoad")){
-        museumSet = JSON.parse(localStorage.getItem("museumSet"))
         let NewSet = JSON.parse(localStorage.getItem("hairtailSet"));
         for (object of NewSet){
             let hairtailObject = new Hairtail(width * posX, height * posY, object[0], object[1]);
@@ -384,7 +398,11 @@ buyTreatmentKitButtonUI.onclick = () => {
     }
 }
 gamblingButtonUI.onclick = () => {
-    money = Math.round(money * Math.random() * 2)
+    let random = Math.round(money * Math.random() * 2)
+    money = random
+    if (random > 1){
+        missionList[3].isSuccessCondition = true
+    }
 }
 upgradeEndButtonUI.onclick = () => {
     statusHairtail = null;
@@ -460,6 +478,21 @@ document.addEventListener("mousemove", (event) => {
     Y = event.pageY
 })
 function InGameLoop(){
+    if (money < eggPrice){
+        buyHairtailButtonUI.style.backgroundColor = "red"
+    }else{
+        buyHairtailButtonUI.style.backgroundColor = "white"
+    }
+    if (money < ((statusHairtail) ? statusHairtail.data.price : 0)){
+        upgradeButtonUI.style.backgroundColor = "red"
+    }else{
+        upgradeButtonUI.style.backgroundColor = "white"
+    }
+    if (money < 5000){
+        buyTreatmentKitButtonUI.style.backgroundColor = "red"
+    }else{
+        buyTreatmentKitButtonUI.style.backgroundColor = "white"
+    }
     for (object of MissionsSet){
         object.object.style.display = missionUI.style.display   
     }
@@ -467,7 +500,11 @@ function InGameLoop(){
     mouseFollowUI.style.height = `${height * 0.16}px`
     mouseFollowUI.style.width = `${width * 0.2}px`
     mouseFollowUI.style.top = `${Y + 10}px`
-    mouseFollowUI.style.left = `${X + 10}px`
+    if (X + 10 + Number(mouseFollowUI.style.width.replace("px","")) > width){
+        mouseFollowUI.style.left = `${X - 10 - Number(mouseFollowUI.style.width.replace("px",""))}px`
+    }else{
+        mouseFollowUI.style.left = `${X + 10}px`
+    }
     moneyUI.innerHTML = `$${Math.floor(money)}`;
     for (let value of hairtailSet)
         value.Update();
@@ -481,7 +518,6 @@ function InGameLoop(){
     for (object of hairtailSet){
         newList.push([object.data.hairtailLevel, object.data.price])
     }
-    localStorage.setItem("museumSet", JSON.stringify(museumSet));
     localStorage.setItem("missionList", JSON.stringify(newMissionList))
     localStorage.setItem("hairtailSet", JSON.stringify(newList));
     localStorage.setItem("money", money);
@@ -687,13 +723,11 @@ function StartGame(){
     let newPosY = 0.3;
     for (object of missionList){
         let missionObject = new Missions(width * newPosX, height * newPosY, object);
-        missionObject.object.addEventListener("click", () => {
-    });
-    newPosX += 0.1;
-    if (newPosX + 0.1 > 1){
-        newPosY += 0.12
-        newPosX = 0.62
-    }
+        newPosX += 0.1;
+        if (newPosX > 1){
+            newPosY += 0.12
+            newPosX = 0.62
+        }
     }
     UpdateUI();
     InGameLoop();
