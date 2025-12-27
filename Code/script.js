@@ -318,28 +318,28 @@ background.style.width = `${width}px`;
 background.style.height = `${height}px`;
 background.style.backgroundSize = `${width}px ${height}px`;
 background.style.opacity = 0.1;
-buttonSet.loadGameButtonUI.object.style.display = (localStorage.getItem("isLoad")) ? "block" : "none"
+buttonSet.loadGameButtonUI.object.style.display = (localStorage.getItem("Upgrade-to-hairtail-2/isLoad")) ? "block" : "none"
 talkBoxUI.style.display = "none";
 document.body.style.margin = "0px";
 document.body.style.overflow = "hidden";
 document.body.style.padding = "0px";
 buttonSet.newGameButtonUI.object.onclick = () => {
-    localStorage.setItem("isLoad", true);
-    localStorage.setItem("hairtailSet", JSON.stringify([]));
-    localStorage.setItem("money", 10000);
-    localStorage.setItem("treatmentKit", 0);
+    localStorage.setItem("Upgrade-to-hairtail-2/isLoad", true);
+    localStorage.setItem("Upgrade-to-hairtail-2/hairtailSet", JSON.stringify([]));
+    localStorage.setItem("Upgrade-to-hairtail-2/money", 10000);
+    localStorage.setItem("Upgrade-to-hairtail-2/treatmentKit", 0);
     StartGame();
     startTutorial();
 }
 buttonSet.loadGameButtonUI.object.onclick = () => {
     posX = 0.2;
     posY = 0.3;
-    let newMissionList = JSON.parse(localStorage.getItem("missionList"))
+    let newMissionList = JSON.parse(localStorage.getItem("Upgrade-to-hairtail-2/missionList"))
     for (let object of missionList){
         object.isSuccess = newMissionList[missionList.indexOf(object)]
     }
-    if (localStorage.getItem("isLoad")){
-        let NewSet = JSON.parse(localStorage.getItem("hairtailSet"));
+    if (localStorage.getItem("Upgrade-to-hairtail-2/isLoad")){
+        let NewSet = JSON.parse(localStorage.getItem("Upgrade-to-hairtail-2/hairtailSet"));
         for (object of NewSet){
             let hairtailObject = new Hairtail(width * posX, height * posY, object[0], object[1]);
             hairtailObject.object.addEventListener("click", () => {
@@ -353,8 +353,8 @@ buttonSet.loadGameButtonUI.object.onclick = () => {
             posX = 0.2
         }
         }
-        money = Number(localStorage.getItem("money"));
-        treatmentKit = Number(localStorage.getItem("treatmentKit"));
+        money = Number(localStorage.getItem("Upgrade-to-hairtail-2/money"));
+        treatmentKit = Number(localStorage.getItem("Upgrade-to-hairtail-2/treatmentKit"));
         StartGame();
     }
 }
@@ -518,10 +518,10 @@ function InGameLoop(){
     for (object of hairtailSet){
         newList.push([object.data.hairtailLevel, object.data.price])
     }
-    localStorage.setItem("missionList", JSON.stringify(newMissionList))
-    localStorage.setItem("hairtailSet", JSON.stringify(newList));
-    localStorage.setItem("money", money);
-    localStorage.setItem("treatmentKit", treatmentKit);
+    localStorage.setItem("Upgrade-to-hairtail-2/missionList", JSON.stringify(newMissionList))
+    localStorage.setItem("Upgrade-to-hairtail-2/hairtailSet", JSON.stringify(newList));
+    localStorage.setItem("Upgrade-to-hairtail-2/money", money);
+    localStorage.setItem("Upgrade-to-hairtail-2/treatmentKit", treatmentKit);
     requestAnimationFrame(InGameLoop);
 }
 function Loop(){
